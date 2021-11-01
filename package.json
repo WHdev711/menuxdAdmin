@@ -1,0 +1,49 @@
+{
+  "name": "admin-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://menuxd.gitlab.io",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "chart.js": "^2.8.0",
+    "classnames": "^2.2.6",
+    "immutability-helper": "^3.0.1",
+    "prop-types": "^15.7.2",
+    "react": "^16.10.2",
+    "react-alert": "^5.5.0",
+    "react-alert-template-basic": "^1.0.0",
+    "react-chartjs-2": "^2.8.0",
+    "react-dnd": "^9.3.4",
+    "react-dnd-html5-backend": "^9.3.4",
+    "react-dom": "^16.10.2",
+    "react-intl": "^2.8.0",
+    "react-perfect-scrollbar": "^1.4.4",
+    "react-redux": "^6.0.1",
+    "react-router-dom": "^5.0.0",
+    "react-scripts": "2.1.8",
+    "react-select": "^3.0.4",
+    "react-transition-group": "^2.6.1",
+    "react-websocket": "^2.1.0",
+    "reactstrap": "^7.1.0",
+    "redux": "^4.0.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "devDependencies": {
+    "enzyme": "^3.9.0",
+    "node-sass": "^4.11.0"
+  }
+}

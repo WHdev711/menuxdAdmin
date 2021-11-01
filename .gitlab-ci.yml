@@ -1,0 +1,25 @@
+image: node:alpine
+
+cache:
+  untracked: true
+  paths:
+  - node_modules
+
+
+before_script:
+  - npm install
+
+stages:
+- deploy
+
+pages:
+  stage: deploy
+  script:
+    - CI=true npm run build
+    - rm -rf public
+    - mv build public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master

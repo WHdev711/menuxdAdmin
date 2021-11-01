@@ -1,0 +1,111 @@
+import React, { useState, useEffect, Fragment } from 'react'
+import { withRouter } from 'react-router-dom'
+import { CardDeck, Row, Button } from 'reactstrap'
+import { useAlert } from 'react-alert'
+
+import IntlMessages from '../../util/IntlMessages'
+import { Colxx } from '../../components/CustomBootstrap'
+import Spinner from '../../components/Spinner'
+import { getWaiters, deleteWaiter } from '../../util/fetch/waiter'
+import WaiterCard from '../../components/WaiterCard'
+import WaiterEditModal from '../../components/WaiterEditModal'
+import WaiterCreateModal from '../../components/WaiterCreateModal'
+import ActionModal from '../../components/ActionModal'
+import GoBackButton from '../../components/GoBackButton'
+import Message from '../../components/Message'
+
+const WaiterContainer = ({ match, token, history }) => {
+  const [waiters, setWaiters] = useState(null)
+  const [updateModal, setUpdateModal] = useState(false)
+  const [createModal, setCreateModal] = useState(false)
+  const [actionModal, setActionModal] = useState(false)
+  const [currentWaiter, setCurrentWaiter] = useState(null)
+  const clientId = parseInt(match.params.id, 10)
+  const alert = useAlert()
+
+  const loadWaiters = () => {
+    getWaiters(clientId, token)
+      .then(res => {
+        setWaiters(res.data)
+      })
+      .catch(err => alert.error('Error'))
+  }
+
+  useEffect(() => {
+    loadWaiters()
+  }, [])
+
+  const deleteWaiterById = id => {
+    deleteWaiter(id, token).then(() => {
+      getWaiters(clientId, token).then(res => setWaiters(res.data))
+      setActionModal(false)
+    }).catch(err => alert.error('Error'))
+  }
+
+  return (
+    <Fragment>
+      <Row>
+        <Colxx>
+          <h1><IntlMessages id='menu.waiters' /></h1>
+        </Colxx>
+      </Row>
+      <Row>
+        <Colxx xs='2' className='ml-auto mr-1' >
+          <GoBackButton history={history} />
+        </Colxx>
+        <Colxx xs='4'>
+          <Button style={{ height: '2.5rem' }} onClick={() => setCreateModal(true)} className='mr-1' color='primary'>
+            <IntlMessages id='button.add' />
+          </Button>
+        </Colxx>
+      </Row>
+      <CardDeck>
+        {waiters ?
+          <Row style={{ width: '100%' }}>
+            {waiters.length > 0 ? waiters.map(waiter => (
+              <Colxx className='mb-5' xs='12' md='6' lg='4' xl='3' key={waiter.id}>
+                <WaiterCard
+                  setCurrentWaiter={() => setCurrentWaiter(waiter)}
+                  setActionModal={setActionModal}
+                  deleteWaiter={() => deleteWaiter(waiter.id)}
+                  openModal={() => setUpdateModal(true)}
+                  name={waiter.name}
+                  pin={waiter.pin}
+                  id={waiter.id}
+                />
+              </Colxx>)) : <Message><IntlMessages id='forms.not-have-waiters' /></Message>}
+          </Row>
+          : <Spinner />}
+      </CardDeck>
+      {currentWaiter && <WaiterEditModal
+        token={token}
+        updateWaiters={loadWaiters}
+        open={updateModal}
+        currentName={currentWaiter.name}
+        currentPin={currentWaiter.pin}
+        id={currentWaiter.id}
+        close={() => setUpdateModal(false)}
+      />
+      }
+
+      <WaiterCreateModal
+        token={token}
+        open={createModal}
+        close={() => setCreateModal(false)}
+        updateWaiters={loadWaiters}
+        clientId={clientId}
+      />
+
+      {currentWaiter && <ActionModal
+        action={() => deleteWaiterById(currentWaiter.id)}
+        close={() => setActionModal(false)}
+        open={actionModal}
+      >
+        <IntlMessages id='forms.want-delete-waiter' /> {' '} {currentWaiter.name}?
+       </ActionModal>
+      }
+    </Fragment>
+  )
+}
+
+export default withRouter(WaiterContainer)
