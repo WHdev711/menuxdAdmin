@@ -26,6 +26,13 @@ class LoginLayout extends Component {
     loginUser(email, password)
       .then(res => {
         const { user, token } = res.data
+        console.log(res.data)
+        if (res.data == "Passwords don't match\n" || res.data == "could not found it\n")
+        {
+          this.props.alert.error('Invalid email or password')
+          this.setState({ isLoading: false })
+          return
+        }
         window.localStorage.setItem('user', JSON.stringify(user))
         window.localStorage.setItem('token', token)
         this.setState({ isLoading: false })

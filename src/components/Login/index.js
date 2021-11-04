@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Fragment, useState } from 'react';
+
+import HCaptcha from '@hcaptcha/react-hcaptcha';
 import { Button, CardTitle, Form, Input, Label, Spinner } from 'reactstrap';
 import IntlMessages from '../../util/IntlMessages';
 
@@ -7,6 +9,11 @@ import IntlMessages from '../../util/IntlMessages';
 const LoginLayout = ({ setForgotPassword, loginUser, isLoading }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [hcaptcha, setHcaptcha] = useState('');
+
+    const onVerifyCaptcha = (token) => {
+        setHcaptcha(token);
+    };
 
     const onUserLogin = (e) => {
         e.preventDefault();
@@ -15,7 +22,7 @@ const LoginLayout = ({ setForgotPassword, loginUser, isLoading }) => {
 
     const isValid = () => {
         const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(email.toLowerCase()) && password !== '';
+        return re.test(email.toLowerCase()) && password !== '' && hcaptcha !== '';
     };
 
     const onClick = e => {
@@ -45,7 +52,9 @@ const LoginLayout = ({ setForgotPassword, loginUser, isLoading }) => {
                     }
                     placeholder='goGo123' />
                 <IntlMessages id='user.password' />
-            </Label> <div className='d-flex justify-content-between align-items-center' >
+            </Label> 
+            <HCaptcha sitekey="f072ee6b-6b16-4d9f-b4b9-d8c9fe7ff086" onVerify={onVerifyCaptcha} />
+            <div className='d-flex justify-content-between align-items-center' >
                 <a href='/'
                     onClick={onClick} >
                     <IntlMessages id='user.forgot-password-question' />

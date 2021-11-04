@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://menuxd.gitlab.io",
   "dependencies": {
+    "@hcaptcha/react-hcaptcha": "^0.3.8",
     "axios": "^0.18.0",
     "chart.js": "^2.8.0",
     "classnames": "^2.2.6",
