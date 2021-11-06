@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import React, { Fragment, useEffect, useState } from 'react';
 import { useAlert } from 'react-alert';
 import Select from 'react-select';
-import { Button, Col, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Spinner, UncontrolledTooltip } from 'reactstrap';
+import { Button, Col, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Spinner, Row, UncontrolledTooltip } from 'reactstrap';
 import ImageUpload from '../../components/ImageUpload';
 import SelectDays from '../../components/SelectDays';
-import { getAllDishes } from '../../util/fetch/dish';
+import IngredientsPromo from '../../components/Ingredients _Promo';
 import { uploadPicture } from '../../util/fetch/picture';
 import { createPromotion } from '../../util/fetch/promotion';
 import IntlMessages from '../../util/IntlMessages';
@@ -13,40 +13,44 @@ import IntlMessages from '../../util/IntlMessages';
 const PromotionCreateModal = ({ open, close, className, updatePromotions, clientId, token, locale }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [title, setTitle] = useState('');
-  const [picture, setPicture] = useState('');
+  const [picture1, setPicture1] = useState(null);
+  const [picture2, setPicture2] = useState(null);
   const [days, setDays] = useState([]);
-  const [dish, setDish] = useState(null);
-  const [dishes, setDishes] = useState([]);
   const [startAt, setStartAt] = useState('');
   const [endAt, setEndAt] = useState('');
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState(0);
+  const [ingredients, setIngredients] = useState([]);
   const alert = useAlert();
 
-  useEffect(() => {
-    setIsLoading(true);
-    getAllDishes(token, clientId)
-      .then(res => {
-        setIsLoading(false);
-        setDishes(res.data);
-      })
-      .catch((err) => {
-        alert.error('Error');
-        setIsLoading(false);
-      });
-  }, [clientId]);
+  const style1 = {
+    width: '150px',
+    height: '150px',
+    margin: '.2rem auto'
+  };
+
+  const style2 = {
+    width: '120px',
+    height: '120px',
+    margin: '.2rem auto'
+  };
 
   const cleanForm = () => {
-    setPicture('');
     setTitle('');
     setDays([]);
-    setDish(null);
+    setDescription('');
+    setPrice(0);
+    setPicture1('');
+    setPicture2('');
+    setIngredients([]);
   };
 
   const addPromotion = async () => {
     setIsLoading(true);
     try {
       const promotion = {
-        title, picture, days, dish_id: parseInt(dish), start_at: startAt,
-        end_at: endAt, client_id: clientId
+        title, pictures: [picture1, picture2], days, start_at: startAt,
+        end_at: endAt, description, price, ingredients, client_id: clientId
       };
       await createPromotion(promotion, token);
       setIsLoading(false);
@@ -60,16 +64,37 @@ const PromotionCreateModal = ({ open, close, className, updatePromotions, client
     }
   };
 
-  const handlePictureChange = async ({ target }) => {
-    setIsLoading(true);
-    try {
-      const res = await uploadPicture(clientId, target.name, target.files[0], token)
-      setPicture(res.data);
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      alert.error('Error');
-    }
+  // const handlePictureChange = async ({ target }) => {
+  //   setIsLoading(true);
+  //   try {
+  //     const res = await uploadPicture(clientId, target.name, target.files[0], token)
+  //     setPicture(res.data);
+  //     setIsLoading(false);
+  //   } catch (error) {
+  //     setIsLoading(false);
+  //     alert.error('Error');
+  //   }
+  // };
+  const handlePictureChange = ({ target }) => {
+    setIsLoading(true)
+    uploadPicture(clientId, target.name, target.files[0], token)
+      .then(res => {
+        setIsLoading(false)
+        switch (target.name) {
+          case 'promotion-01':
+            setPicture1(res.data)
+            break
+          case 'promotion-02':
+            setPicture2(res.data)
+            break
+          default:
+            return
+        }
+      })
+      .catch(() => {
+        setIsLoading(false);
+        alert.error('Error');
+      });
   };
 
   return (
@@ -124,13 +149,32 @@ const PromotionCreateModal = ({ open, close, className, updatePromotions, client
               </Col>
             </FormGroup>
             <FormGroup row>
-              <Label for='dishInput' sm={3}>
-                <IntlMessages id='forms.dish' />
+              <Label for='descriptionInput' sm={3}>
+                <IntlMessages id='forms.description' />
               </Label>
               <Col sm={9}>
-                <Select
-                  options={dishes.map(d => ({ label: d.name, value: d.id }))}
-                  onChange={(e) => setDish(e.value)}
+                <Input
+                  className='form-control'
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
+                  type='textarea'
+                  name='description'
+                  id='descriptionInput'
+                />
+              </Col>
+            </FormGroup>
+            <FormGroup row>
+              <Label for='priceInput' sm={3}>
+                <IntlMessages id='forms.price' />
+              </Label>
+              <Col sm={9}>
+                <Input
+                  className='form-control'
+                  value={price}
+                  onChange={e => setPrice(parseInt(e.target.value))}
+                  type='number'
+                  name='price'
+                  id='priceInput'
                 />
               </Col>
             </FormGroup>
@@ -143,7 +187,22 @@ const PromotionCreateModal = ({ open, close, className, updatePromotions, client
                 </UncontrolledTooltip>
               </Label>
               <Col className='align-self-center' sm={9}>
-                <ImageUpload id='pictureInput' name='category' onChange={handlePictureChange} />
+                <Row>
+                  <Col sm={6}>
+                    <ImageUpload style={style1} name='promotion-01' onChange={handlePictureChange} />
+                  </Col>
+                  <Col sm={3}>
+                    <ImageUpload style={style2} name='promotion-02' onChange={handlePictureChange} />
+                  </Col>
+                </Row>
+              </Col>
+            </FormGroup>
+            <FormGroup row>
+              <Label for='ingredientsInput' sm={12}>
+                <IntlMessages id='forms.ingredients' />
+              </Label>
+              <Col sm={9}>
+                <IngredientsPromo ingredients={ingredients} updateIngredients={(i) => setIngredients(i)} />
               </Col>
             </FormGroup>
           </Form>

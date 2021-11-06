@@ -4,19 +4,19 @@ import Price from '../../components/Price';
 import IntlMessages from '../../util/IntlMessages';
 
 
-const Ingredients = ({ ingredients = [], dishId = 0, updateIngredients }) => {
+const IngredientsPromo = ({ ingredients = [], promotionId = 0, updateIngredients }) => {
     const [name, setName] = useState('')
     const [price, setPrice] = useState(0)
 
     const remove = (id) => {
         let newIngredients = ingredients.filter((i, n) => n !== id)
-
+        console.log(newIngredients)
         updateIngredients(newIngredients)
     }
 
-    const dish_add = () => {
-        console.log("In Dish, Ingredients Added!");
-        let newIngredients = [...ingredients, { price, name, dish_id: dishId, active: price <= 0 }]
+    const promotion_add = () => {
+        console.log("In Promotion Ingredients Added!");
+        let newIngredients = [...ingredients, { price, name, promotion_id: promotionId, active: price <= 0 }]
         updateIngredients(newIngredients)
         setName('')
         setPrice(0)
@@ -43,7 +43,7 @@ const Ingredients = ({ ingredients = [], dishId = 0, updateIngredients }) => {
                 </FormGroup>
                 <Button
                     className='mx-auto mt-3'
-                    onClick={() => dish_add()} color='primary'
+                    onClick={() => promotion_add()} color='primary'
                 >
                     <IntlMessages id='button.add' />
                 </Button>
@@ -69,4 +69,4 @@ const Ingredients = ({ ingredients = [], dishId = 0, updateIngredients }) => {
     )
 }
 
-export default Ingredients
+export default IngredientsPromo
